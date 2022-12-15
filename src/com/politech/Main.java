@@ -5,71 +5,75 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        double xn, xk, h, num, x;
+        double start, end, step, num, x;
         MutableDouble y1 = new MutableDouble(0.0);
         MutableDouble y2 = new MutableDouble(0.0);
         int err = 0, err2;
 
         do {
-            System.out.println("Введите в одну строку:\nХначальное Хконечное Шаг ПраметрNUM (разделитель ',')");
+            System.out.println("Введите в одну строку:\nНачальный X, Конечный X, Дельта X и параметр NUM (разделитель ';')");
             Scanner scanner = new Scanner(System.in);
-            String[] numbers = scanner.nextLine().replace(" ", "").split(",");
-            xn = Double.parseDouble(numbers[0]);
-            xk = Double.parseDouble(numbers[1]);
-            h = Double.parseDouble(numbers[2]);
-            num = Double.parseDouble(numbers[3]);
-
+            String[] numbers = scanner.nextLine().replace(" ", "").replace(",",".").split(";");
             err = 0;
+            try {
+                start = Double.parseDouble(numbers[0]);
+                end = Double.parseDouble(numbers[1]);
+                step = Double.parseDouble(numbers[2]);
+                num = Double.parseDouble(numbers[3]);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Введены данные в неверном формате. Пожалуйста, вводите только цифры");
+            }
 
-            if( Math.abs(xk - xn) < h
-                    || h == 0
-                    || (xk - xn) / h < 0) {
-                err = -2;
+            if( Math.abs(end - start) < step
+                    || step == 0
+                    || (end - start) / step < 0) {
+                err = -1;
                 System.out.println("Неверно задан шаг аргумента");
             }
-            if (xk - xn  < 0 && h >= 0) {
+            if (end - start  < 0 && step >= 0) {
                 err = -1;
                 System.out.println("Неверно задан интервал");
             }
         } while (err < 0);
 
         System.out.println(
-                "---------------------------------------------------------------------\n" +
+                        "---------------------------------------------------------------------\n" +
                         "    N   |      X        |     Y1(x)     |     Y2(x)     |  MIN(Y1,Y2)\n" +
                         "---------------------------------------------------------------------");
-        y1.setValue(0.0);
-        y2.setValue(0.0);
-        int n, m;
-        m = (int) (Math.abs((xk - xn) / h) + 1);
-        x = xn;
-        for (n = 1; n <= m; n++)
+        int currentStep, overallSteps;
+        overallSteps = (int) (Math.abs((end - start) / step) + 1);
+        x = start;
+        for (currentStep = 1; currentStep <= overallSteps; currentStep++)
         {
-            System.out.printf("%5d\t|%8.2f\t", n , x);
-            err = f1(y1, x, num);
+            System.out.printf("%5d\t|%8.2f\t", currentStep , x);
+            err = calculateFirstParam(y1, x, num);
             if (err > 0)
             {
                 System.out.printf("\t|%10.3f", y1.getValue());
+                System.out.print("\t");
             }
             else {
                 System.out.print("\t|Не вычислимо");
             }
 
-            err2 = f2(y2, x, num);
+            err2 = calculateSecondParam(y2, x, num);
             if (err2 > 0)
             {
-                System.out.printf("\t|%10.3f\t", y2.getValue());
+                System.out.printf("\t|%10.3f", y2.getValue());
+                System.out.print("\t");
             } else {
                 System.out.print("\t|Не вычислимо");
             }
 
             if (err > 0 && err2 > 0) {
-                System.out.printf("\t|%10.3f\t", min(y1, y2));
+                System.out.printf("\t|%10.3f", min(y1, y2));
+                System.out.print("\t");
             } else {
                 System.out.print("\t|Не вычислимо");
             }
 
             System.out.println();
-            x += h;
+            x += step;
         }
         System.out.print("---------------------------------------------------------------------\n");
     }
@@ -78,7 +82,7 @@ public class Main {
         return Math.min(y1.getValue(), y2.getValue());
     }
 
-    private static int f1(MutableDouble y, double x, double num) {
+    private static int calculateFirstParam(MutableDouble y, double x, double num) {
         double p1 = 0;
         double p2 = 0;
         p1 = Math.cos(x - num);
@@ -86,12 +90,12 @@ public class Main {
             return -1;
         p2 = (1 - num) / p1;
         if (p2 <= 0)
-            return -2;
+            return -1;
         y.setValue(Math.log(p2) / (Math.log(Math.abs(num / 10) + 4))); // по свойству логарифма
         return 1;
     }
 
-    private static int f2(MutableDouble y, double x, double num) {
+    private static int calculateSecondParam(MutableDouble y, double x, double num) {
         if (num == 0) {
             return -1;
         }
