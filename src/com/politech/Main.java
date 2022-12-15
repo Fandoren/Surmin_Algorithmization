@@ -33,15 +33,16 @@ public class Main {
             }
         } while (err < 0);
 
-        System.out.println("---------------------------------------------------------------------\n" +
-                "    N   |      X        |     Y1(x)     |     Y2(x)     |  MAX(Y1,Y2)\n" +
-                "---------------------------------------------------------------------");
+        System.out.println(
+                "---------------------------------------------------------------------\n" +
+                        "    N   |      X        |     Y1(x)     |     Y2(x)     |  MIN(Y1,Y2)\n" +
+                        "---------------------------------------------------------------------");
         y1.setValue(0.0);
         y2.setValue(0.0);
         int n, m;
         m = (int) (Math.abs((xk - xn) / h) + 1);
         x = xn;
-        for (n=1; n <= m; n++)
+        for (n = 1; n <= m; n++)
         {
             System.out.printf("%5d\t|%8.2f\t", n , x);
             err = f1(y1, x, num);
@@ -49,21 +50,23 @@ public class Main {
             {
                 System.out.printf("\t|%10.3f", y1.getValue());
             }
-            else
+            else {
                 System.out.print("\t|Не вычислимо");
+            }
 
             err2 = f2(y2, x, num);
             if (err2 > 0)
             {
                 System.out.printf("\t|%10.3f\t", y2.getValue());
+            } else {
+                System.out.print("\t|Не вычислимо");
             }
-            else
-                System.out.print("\t|Не вычислимо");
 
-            if(err > 0 && err2 > 0)
-                System.out.printf("\t|%10.3f\t", max(y1, y2));
-            else
+            if (err > 0 && err2 > 0) {
+                System.out.printf("\t|%10.3f\t", min(y1, y2));
+            } else {
                 System.out.print("\t|Не вычислимо");
+            }
 
             System.out.println();
             x += h;
@@ -71,27 +74,34 @@ public class Main {
         System.out.print("---------------------------------------------------------------------\n");
     }
 
-    private static double max(MutableDouble y1, MutableDouble y2) {
-        return Math.max(y1.getValue(), y2.getValue());
+    private static double min(MutableDouble y1, MutableDouble y2) {
+        return Math.min(y1.getValue(), y2.getValue());
     }
 
     private static int f1(MutableDouble y, double x, double num) {
         double p1 = 0;
         double p2 = 0;
-        p1 = Math.sin(x + num);
+        p1 = Math.cos(x - num);
         if (p1 == 0)
             return -1;
         p2 = (1 - num) / p1;
         if (p2 <= 0)
             return -2;
-        y.setValue(Math.log(p2) / (Math.log(Math.abs(num / 10) + 2)));
+        y.setValue(Math.log(p2) / (Math.log(Math.abs(num / 10) + 4))); // по свойству логарифма
         return 1;
     }
 
     private static int f2(MutableDouble y, double x, double num) {
-        if (num == 0) return -1;
-        y.setValue(Math.abs(Math.cos(x) / num));
-        return 1;
+        if (num == 0) {
+            return -1;
+        }
+        double p1 = Math.sin(x);
+        if (p1 != 0) {
+            y.setValue(Math.sin(x) / num);
+            return 1;
+        } else {
+            return -1;
+        }
     }
 
     static class MutableDouble {
