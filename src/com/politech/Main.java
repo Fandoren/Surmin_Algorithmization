@@ -5,13 +5,13 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        double start, end, step, num, x;
+        double start, end, step, x;
         MutableDouble y1 = new MutableDouble(0.0);
         MutableDouble y2 = new MutableDouble(0.0);
         int err = 0, err2;
 
         do {
-            System.out.println("Введите в одну строку:\nНачальный X, Конечный X, Дельта X и параметр NUM (разделитель ';')");
+            System.out.println("Введите в одну строку:\nНачальный X, Конечный X, Дельта X (разделитель ';')");
             Scanner scanner = new Scanner(System.in);
             String[] numbers = scanner.nextLine().replace(" ", "").replace(",",".").split(";");
             err = 0;
@@ -19,7 +19,6 @@ public class Main {
                 start = Double.parseDouble(numbers[0]);
                 end = Double.parseDouble(numbers[1]);
                 step = Double.parseDouble(numbers[2]);
-                num = Double.parseDouble(numbers[3]);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Введены данные в неверном формате. Пожалуйста, вводите только цифры");
             }
@@ -46,7 +45,7 @@ public class Main {
         for (currentStep = 1; currentStep <= overallSteps; currentStep++)
         {
             System.out.printf("%5d\t|%8.2f\t", currentStep , x);
-            err = calculateFirstParam(y1, x, num);
+            err = calculateFirstParam(y1, x);
             if (err > 0)
             {
                 System.out.printf("\t|%10.3f", y1.getValue());
@@ -56,7 +55,7 @@ public class Main {
                 System.out.print("\t|Не вычислимо");
             }
 
-            err2 = calculateSecondParam(y2, x, num);
+            err2 = calculateSecondParam(y2, x);
             if (err2 > 0)
             {
                 System.out.printf("\t|%10.3f", y2.getValue());
@@ -82,26 +81,23 @@ public class Main {
         return Math.min(y1.getValue(), y2.getValue());
     }
 
-    private static int calculateFirstParam(MutableDouble y, double x, double num) {
+    private static int calculateFirstParam(MutableDouble y, double x) {
         double p1 = 0;
         double p2 = 0;
-        p1 = Math.cos(x - num);
+        p1 = Math.cos(x - 85);
         if (p1 == 0)
             return -1;
-        p2 = (1 - num) / p1;
+        p2 = (1 - 85) / p1;
         if (p2 <= 0)
             return -1;
-        y.setValue(Math.log(p2) / (Math.log(Math.abs(num / 10) + 4))); // по свойству логарифма
+        y.setValue(Math.log(p2) / (Math.log(Math.abs(85 / 10) + 4))); // по свойству логарифма
         return 1;
     }
 
-    private static int calculateSecondParam(MutableDouble y, double x, double num) {
-        if (num == 0) {
-            return -1;
-        }
+    private static int calculateSecondParam(MutableDouble y, double x) {
         double p1 = Math.sin(x);
         if (p1 != 0) {
-            y.setValue(Math.sin(x) / num);
+            y.setValue(Math.sin(x) / 85);
             return 1;
         } else {
             return -1;
