@@ -61,7 +61,7 @@ public class Main {
                 System.out.print("\t|Не вычислимо");
             }
             y2 = calculateSecondParam(x);
-            if (y2 != 0)
+            if (y2 != null)
             {
                 System.out.printf("\t|%10.3f", y2);
                 System.out.print("\t");
